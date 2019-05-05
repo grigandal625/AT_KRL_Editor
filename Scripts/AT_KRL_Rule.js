@@ -68,19 +68,19 @@ var AT_KRL_Rule = function (a, cs, fs, n, e) {
 		var r = fs.result ? (fs.result.length ? fs.result : [fs.result]) : (fs.length ? fs : [fs]);
 		var res = true;
 		for (var i = 0; i < r.length; i++) {
-			if (!AT_KRL_Parser.prototype.factIsSimple(r[i])) {
+			if (!this.factIsSimple(r[i])) {
 				throw new Error('Invalid format of conclusion facts to create Rule');
 			}
-			res = res && AT_KRL_Parser.prototype.factIsSimple(r[i]);
+			res = res && this.factIsSimple(r[i]);
 		}
 		if (fs.elsresult) {
 			r = fs.elsresult.length ? fs.elsresult : [fs.elsresult];
 			for (var i = 0; i < r.length; i++) {
 				for (var i = 0; i < r.length; i++) {
-					if (!AT_KRL_Parser.prototype.factIsSimple(r[i])) {
+					if (!this.factIsSimple(r[i])) {
 						throw new Error('Invalid format of conclusion facts to create Rule');
 					}
-					res = res && AT_KRL_Parser.prototype.factIsSimple(r[i]);
+					res = res && this.factIsSimple(r[i]);
 				}
 			}
 		}
@@ -117,6 +117,38 @@ AT_KRL_Rule.prototype.conditionHasTwoSides = function (cs) {
 		return this.conditionHasTwoSides(cs.condition[0]);
 	}
 	return false;
+}
+
+AT_KRL_Rule.prototype.sideHasNoObject = function(side){
+	if (typeof(side) == "number" || typeof(side) == "string"){
+		return true;
+	}
+	if (side.expressions){
+		var res = true;
+		for (var i = 0; i < side.expressions.length; i++){
+			res = res && this.sideHasNoObject(side.expressions[i]);
+		}
+		return res;
+	}
+	return false;
+}
+
+AT_KRL_Rule.prototype.sideIsOnlyObject = function(side){
+	if (side.object && side.aIndex != null && side.object.attributes[side.aIndex]){
+		return true;
+	}
+	if (side.expressions && side.expressions.length == 1){
+		return this.sideIsOnlyObject(side.expressions[0]);
+	}
+	return false;
+}
+
+AT_KRL_Rule.prototype.factIsSimple = function (f, l) {
+	var res = this.sideIsOnlyObject(f.leftside) && this.sideHasNoObject(f.rightside);
+	if (!res) {
+		throw new SyntaxError('Описание факта "' + l + '" не подходит для описания результата правила\nТребуемый формат: ОБЪЕКТ.АТРИБУТ=значение');
+	}
+	return res;
 }
 
 AT_KRL_Rule.prototype.getKRL = function () {
