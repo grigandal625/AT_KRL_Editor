@@ -1131,8 +1131,32 @@ AT_KRL_Parser.prototype.parseRuleConditionsFL = function (lines) {
 	return this.parseRuleConditions(line);
 }
 
+AT_KRL_Parser.prototype.sideHasNoObject = function(side){
+	if (typeof(side) == "number" || typeof(side) == "string"){
+		return true;
+	}
+	if (side.expressions){
+		var res = true;
+		for (var i = 0; i < side.expressions.length; i++){
+			res = res && this.sideHasNoObject(side.expressions[i]);
+		}
+		return res;
+	}
+	return false;
+}
+
+AT_KRL_Parser.prototype.sideIsOnlyObject = function(side){
+	if (side.object && side.aIndex != null && side.object.attributes[side.aIndex]){
+		return true;
+	}
+	if (side.expressions && side.expressions.length == 1){
+		return this.sideIsOnlyObject(side.expressions[0]);
+	}
+	return false;
+}
+
 AT_KRL_Parser.prototype.factIsSimple = function (f, l) {
-	var res = (typeof(f.rightside) == 'number' || typeof(f.rightside) == 'string') && f.leftside.expressions.length == 1 && f.leftside.expressions[0].object && f.leftside.expressions[0].aIndex && f.leftside.expressions[0].object.attributes[f.leftside.expressions[0].aIndex];
+	var res = this.sideIsOnlyObject(f.leftside) && this.sideHasNoObject(f.rightside);
 	if (!res) {
 		throw new SyntaxError('Описание факта "' + l + '" не подходит для описания результата правила\nТребуемый формат: ОБЪЕКТ.АТРИБУТ=значение');
 	}

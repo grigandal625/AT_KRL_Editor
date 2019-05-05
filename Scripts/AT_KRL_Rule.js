@@ -68,32 +68,25 @@ var AT_KRL_Rule = function (a, cs, fs, n, e) {
 		var r = fs.result ? (fs.result.length ? fs.result : [fs.result]) : (fs.length ? fs : [fs]);
 		var res = true;
 		for (var i = 0; i < r.length; i++) {
-			var es = r[i].leftside.expressions;
-			if (es.length != 1) {
+			if (!AT_KRL_Parser.prototype.factIsSimple(r[i])) {
 				throw new Error('Invalid format of conclusion facts to create Rule');
 			}
-			res = res && (es[0].object && es[0].object.attributes && typeof(es[0].object.attributes[es[0].aIndex].type.values[0]) == typeof(r[i].rightside));
-			if (!res) {
-				throw new Error('Invalid format of conclusion facts to create Rule');
-			}
+			res = res && AT_KRL_Parser.prototype.factIsSimple(r[i]);
 		}
 		if (fs.elsresult) {
 			r = fs.elsresult.length ? fs.elsresult : [fs.elsresult];
 			for (var i = 0; i < r.length; i++) {
-				var es = r[i].leftside.expressions;
-				if (es.length != 1) {
-					throw new Error('Invalid format of else conclusion facts to create Rule');
-				}
-				res = res && (es[0].object && es[0].object.attributes && typeof(es[0].object.attributes[es[0].aIndex].type.values[0]) == typeof(r[i].rightside));
-				if (!res) {
-					throw new Error('Invalid format of else conclusion facts to create Rule');
+				for (var i = 0; i < r.length; i++) {
+					if (!AT_KRL_Parser.prototype.factIsSimple(r[i])) {
+						throw new Error('Invalid format of conclusion facts to create Rule');
+					}
+					res = res && AT_KRL_Parser.prototype.factIsSimple(r[i]);
 				}
 			}
 		}
 		return res;
 	}
-
-	var verificated = true && (cs.condition.length >= 2) && validateResult(fs);
+	var verificated = true && this.conditionHasTwoSides(cs) && validateResult(fs);
 
 	if (verificated) {
 		function validateName(s) {
@@ -112,8 +105,18 @@ var AT_KRL_Rule = function (a, cs, fs, n, e) {
 		this.elsresult = fs.elsresult ? (fs.elsresult.length ? fs.elsresult : [fs.elsresult]) : [];
 		e.pushRule(this);
 	} else {
-		throw new Error('Wrong format of parameters to create rule');
+		throw new Error('Wrong format of parameters to create rule, condition must have two expressions in minimum');
 	}
+}
+
+AT_KRL_Rule.prototype.conditionHasTwoSides = function (cs) {
+	if (cs.condition.length > 1) {
+		return true;
+	}
+	if (cs.condition[0].condition) {
+		return this.conditionHasTwoSides(cs.condition[0]);
+	}
+	return false;
 }
 
 AT_KRL_Rule.prototype.getKRL = function () {
