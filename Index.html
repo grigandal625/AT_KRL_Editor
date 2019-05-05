@@ -46,6 +46,13 @@
         	p.editor.rules = [];
         	console.clear();
         }
+		textArea.style.width = '100%';
+		textArea.style.height = (document.body.offsetHeight - button.offsetHeight - 10) + 'px';
+		textArea.style.resize = 'none';
+		window.onresize = function(){
+			textArea.style.width = '100%';
+			textArea.style.height = (document.body.offsetHeight - button.offsetHeight - 10) + 'px';
+		}
       </script>
    </body>
 </html>
