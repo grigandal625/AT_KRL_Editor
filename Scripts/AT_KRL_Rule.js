@@ -64,23 +64,24 @@ AT_KRL_ConditionAnd.prototype.calculate = function () {
 }
 
 var AT_KRL_Rule = function (a, cs, fs, n, e) {
+	var self = this;
 	function validateResult(fs) {
 		var r = fs.result ? (fs.result.length ? fs.result : [fs.result]) : (fs.length ? fs : [fs]);
 		var res = true;
 		for (var i = 0; i < r.length; i++) {
-			if (!this.factIsSimple(r[i])) {
+			if (!self.factIsSimple(r[i])) {
 				throw new Error('Invalid format of conclusion facts to create Rule');
 			}
-			res = res && this.factIsSimple(r[i]);
+			res = res && self.factIsSimple(r[i]);
 		}
 		if (fs.elsresult) {
 			r = fs.elsresult.length ? fs.elsresult : [fs.elsresult];
 			for (var i = 0; i < r.length; i++) {
 				for (var i = 0; i < r.length; i++) {
-					if (!this.factIsSimple(r[i])) {
+					if (!self.factIsSimple(r[i])) {
 						throw new Error('Invalid format of conclusion facts to create Rule');
 					}
-					res = res && this.factIsSimple(r[i]);
+					res = res && self.factIsSimple(r[i]);
 				}
 			}
 		}
