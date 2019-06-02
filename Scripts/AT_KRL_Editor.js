@@ -4,6 +4,12 @@ var AT_KRL_Editor = function () {
 	this.rules = [];
 }
 
+AT_KRL_Editor.prototype.clear = function(){
+	this.types = [];
+	this.objects = [];
+	this.rules = [];
+}
+
 AT_KRL_Editor.prototype.getAllTypes = function () {
 	return [{
 			"id": 0,
@@ -137,58 +143,4 @@ AT_KRL_Editor.prototype.getKRL = function () {
 		res += this.rules[i].getKRL();
 	}
 	return res;
-}
-
-String.prototype.replaceAll = function (o, n) {
-	if (n.indexOf(o) != -1){
-		throw new ReferenceError('Substitute value must not include replaceable value');
-	}
-	var s = '';
-	for (var i = 0; i < this.length; i++) {
-		s += this[i];
-	}
-	while (s.indexOf(o) != -1) {
-		s = s.replace(o, n);
-	}
-	return s;
-}
-
-Number.prototype.getKRL = function () {
-	return (this).toString();
-}
-
-String.prototype.getKRL = function () {
-	return '"' + this + '"';
-}
-
-Math.logb = function (number, base) {
-	return Math.log(number) / Math.log(base);
-};
-
-Math.ctan = function (x) {
-	return 1 / Math.tan(x);
-}
-
-Math.ctanh = function (x) {
-	return 1 / Math.tanh(x);
-}
-
-Math.actan = function (x) {
-	return Math.PI / 2 - Math.atan(x);
-}
-
-Math.actanh = function (x) {
-	return (Math.logb((x + 1) / (x - 1), Math.E)) * 0.5
-}
-
-Array.prototype.includesAll = function (a) {
-	var res = true;
-	for (var i = 0; i < a.length; i++) {
-		res = res && (this.indexOf(a[i]) != -1);
-	}
-	return res;
-}
-
-Number.prototype.calculate = function () {
-	return parseFloat(this.toString());
 }

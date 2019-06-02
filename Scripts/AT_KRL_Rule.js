@@ -120,13 +120,13 @@ AT_KRL_Rule.prototype.conditionHasTwoSides = function (cs) {
 	return false;
 }
 
-AT_KRL_Rule.prototype.sideHasNoObject = function(side){
-	if (typeof(side) == "number" || typeof(side) == "string"){
+AT_KRL_Rule.prototype.sideHasNoObject = function (side) {
+	if (typeof(side) == "number" || typeof(side) == "string") {
 		return true;
 	}
-	if (side.expressions){
+	if (side.expressions) {
 		var res = true;
-		for (var i = 0; i < side.expressions.length; i++){
+		for (var i = 0; i < side.expressions.length; i++) {
 			res = res && this.sideHasNoObject(side.expressions[i]);
 		}
 		return res;
@@ -134,11 +134,11 @@ AT_KRL_Rule.prototype.sideHasNoObject = function(side){
 	return false;
 }
 
-AT_KRL_Rule.prototype.sideIsOnlyObject = function(side){
-	if (side.object && side.aIndex != null && side.object.attributes[side.aIndex]){
+AT_KRL_Rule.prototype.sideIsOnlyObject = function (side) {
+	if (side.object && side.aIndex != null && side.object.attributes[side.aIndex]) {
 		return true;
 	}
-	if (side.expressions && side.expressions.length == 1){
+	if (side.expressions && side.expressions.length == 1) {
 		return this.sideIsOnlyObject(side.expressions[0]);
 	}
 	return false;

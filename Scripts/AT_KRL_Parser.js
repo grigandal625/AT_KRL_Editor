@@ -107,7 +107,7 @@ AT_KRL_Parser.prototype.parseTypeParentFL = function (lines) {
 
 AT_KRL_Parser.prototype.parseCoordinates = function (l) {
 	var coordinates = [];
-	if (l[0] != '{' || l[l.length - 1] != '}') {
+	if (l.toArray()[0] != '{' || l.toArray()[l.length - 1] != '}') {
 		throw new SyntaxError('Неверный синтаксис задания координат функции принадлежности в объявлении: ' + l);
 	}
 	function sNum(c, s) {
@@ -128,11 +128,11 @@ AT_KRL_Parser.prototype.parseCoordinates = function (l) {
 	var y = '';
 	while (i < l.length) {
 
-		if (state == 'parseX' && l[i] == '|') {
+		if (state == 'parseX' && l.toArray()[i] == '|') {
 			state = "parseY";
 			i++;
 		}
-		if (state == 'parseY' && (l[i] == ';' || l[i] == '}')) {
+		if (state == 'parseY' && (l.toArray()[i] == ';' || l.toArray()[i] == '}')) {
 			state = 'makePair';
 		}
 
@@ -150,7 +150,7 @@ AT_KRL_Parser.prototype.parseCoordinates = function (l) {
 			}
 			x = '';
 			y = '';
-			while (isNaN(parseInt(l[i])) && i < l.length) {
+			while (isNaN(parseInt(l.toArray()[i])) && i < l.length) {
 				i++;
 			}
 			state = 'parseX';
@@ -160,17 +160,17 @@ AT_KRL_Parser.prototype.parseCoordinates = function (l) {
 		}
 
 		if (state == 'parseX') {
-			if (isNaN(parseInt(l[i])) && l[i] != ',' && l[i] != '.') {
+			if (isNaN(parseInt(l.toArray()[i])) && l.toArray()[i] != ',' && l.toArray()[i] != '.') {
 				throw new SyntaxError('Некорректный символ в определении координат функции принадлежности \nВ объявлении ' + l + '\nНа позиции ' + i);
 			}
-			x += l[i].replace(',', '.');
+			x += l.toArray()[i].replace(',', '.');
 		}
 
 		if (state == 'parseY') {
-			if (isNaN(parseInt(l[i])) && l[i] != ',' && l[i] != '.') {
+			if (isNaN(parseInt(l.toArray()[i])) && l.toArray()[i] != ',' && l.toArray()[i] != '.') {
 				throw new SyntaxError('Некорректный символ в определении координат функции принадлежности \nВ объявлении ' + l + '\nНа позиции ' + i);
 			}
-			y += l[i].replace(',', '.');
+			y += l.toArray()[i].replace(',', '.');
 		}
 		i++;
 	}
@@ -445,7 +445,7 @@ AT_KRL_Parser.prototype.parseSimpleMathExpression = function (subline) {
 
 AT_KRL_Parser.prototype.getToNextMathOperation = function (subline, sNames, index, current) {
 	var i = index + current.length;
-	var bracket = (subline[i] == '(') ? 1 : 0;
+	var bracket = (subline.toArray()[i] == '(') ? 1 : 0;
 
 	function isOperation(s, n, i) {
 		var res = false;
@@ -461,10 +461,10 @@ AT_KRL_Parser.prototype.getToNextMathOperation = function (subline, sNames, inde
 	while ((!isOperation(subline, sNames, i) || isOperation(subline, sNames, i) && bracket != 0) && i < subline.length - 1) {
 		i++;
 		o = isOperation(subline, sNames, i);
-		if (subline[i] == "(") {
+		if (subline.toArray()[i] == "(") {
 			bracket++;
 		}
-		if (subline[i] == ")") {
+		if (subline.toArray()[i] == ")") {
 			bracket--;
 		}
 	}
@@ -484,21 +484,21 @@ AT_KRL_Parser.prototype.getToFirstMathOperation = function (subline, sNames) {
 AT_KRL_Parser.prototype.getLineFromBrackets = function (line, index) {
 	var i = index;
 	var res = '';
-	while (line[i] != '(' && i < line.length) {
+	while (line.toArray()[i] != '(' && i < line.length) {
 		i++;
 	}
-	if (line[i] == '(') {
+	if (line.toArray()[i] == '(') {
 		var b = 1;
 		while (i < line.length && b != 0) {
 			i++;
-			if (line[i] == '(') {
+			if (line.toArray()[i] == '(') {
 				b++;
 			}
-			if (line[i] == ')') {
+			if (line.toArray()[i] == ')') {
 				b--;
 			}
 			if (b != 0) {
-				res += line[i]
+				res += line.toArray()[i]
 			}
 		}
 		return {
@@ -518,17 +518,17 @@ AT_KRL_Parser.prototype.getLineFromFirstBrackets = function (line) {
 
 AT_KRL_Parser.prototype.getOperationSides = function (subline, operation, index) {
 	function isInBrackets(line) {
-		if (line[0] != '(') {
+		if (line.toArray()[0] != '(') {
 			return false;
 		} else {
 			var b = 1;
 			var i = 1;
 			var index = 0;
 			while (b != 0 && i < line.length) {
-				if (line[i] == '(') {
+				if (line.toArray()[i] == '(') {
 					b++;
 				}
-				if (line[i] == ')') {
+				if (line.toArray()[i] == ')') {
 					b--;
 				}
 				if (b == 0 && index == 0) {
@@ -572,17 +572,17 @@ AT_KRL_Parser.prototype.getOperationSides = function (subline, operation, index)
 AT_KRL_Parser.prototype.getMathExpressionTree = function (subline) {
 	var inv = '`~!@"№$%&<>?=';
 	function isInBrackets(line) {
-		if (line[0] != '(') {
+		if (line.toArray()[0] != '(') {
 			return false;
 		} else {
 			var b = 1;
 			var i = 1;
 			var index = 0;
 			while (b != 0 && i < line.length) {
-				if (line[i] == '(') {
+				if (line.toArray()[i] == '(') {
 					b++;
 				}
-				if (line[i] == ')') {
+				if (line.toArray()[i] == ')') {
 					b--;
 				}
 				if (b == 0 && index == 0) {
@@ -731,10 +731,10 @@ AT_KRL_Parser.prototype.parseStFzFact = function (line) {
 		var exIndex = s.indexOf('] ТОЧНОСТЬ ') + ('] ТОЧНОСТЬ ').length;
 		for (var i = exIndex; i < s.length; i++) {
 			var count = 0;
-			if (isNaN(parseInt(s[i])) && (s[i] != ',' || s[i] != '.') || (s[i] == ',' || s[i] == '.') && count > 0) {
+			if (isNaN(parseInt(s.toArray()[i])) && (s.toArray()[i] != ',' || s.toArray()[i] != '.') || (s.toArray()[i] == ',' || s.toArray()[i] == '.') && count > 0) {
 				return ' Невозможно получить значение точности в объявлении:\n' + s + '\nНекорректный символ на позиции ' + i + '\nТребуемый формат: УВЕРЕННОСТЬ [число >=0, число >=0] ТОЧНОСТЬ число >=0';
 			}
-			if (s[i] == ',' || s[i] == '.') {
+			if (s.toArray()[i] == ',' || s.toArray()[i] == '.') {
 				count++;
 			}
 		}
@@ -801,10 +801,10 @@ AT_KRL_Parser.prototype.parseMathFact = function (line) {
 		var exIndex = s.indexOf('] ТОЧНОСТЬ ') + ('] ТОЧНОСТЬ ').length;
 		for (var i = exIndex; i < s.length; i++) {
 			var count = 0;
-			if (isNaN(parseInt(s[i])) && (s[i] != ',' || s[i] != '.') || (s[i] == ',' || s[i] == '.') && count > 0) {
+			if (isNaN(parseInt(s.toArray()[i])) && (s.toArray()[i] != ',' || s.toArray()[i] != '.') || (s.toArray()[i] == ',' || s.toArray()[i] == '.') && count > 0) {
 				return ' Невозможно получить значение точности в объявлении:\n' + s + '\nНекорректный символ на позиции ' + i + '\nТребуемый формат: УВЕРЕННОСТЬ [число >=0, число >=0] ТОЧНОСТЬ число >=0';
 			}
-			if (s[i] == ',' || s[i] == '.') {
+			if (s.toArray()[i] == ',' || s.toArray()[i] == '.') {
 				count++;
 			}
 		}
@@ -827,21 +827,21 @@ AT_KRL_Parser.prototype.parseMathFact = function (line) {
 //------Парсинг условий для правил методом построения и обхода дерева разбора------
 AT_KRL_Parser.prototype.getToNextLogicOperation = function (subline, sNames, index, current) {
 	var i = index + current.length;
-	var bracket = (subline[i] == '(') ? 1 : 0;
+	var bracket = (subline.toArray()[i] == '(') ? 1 : 0;
 
 	function isOperation(sl, n, i) {
 		function isInBrackets(line) {
-			if (line[0] != '(') {
+			if (line.toArray()[0] != '(') {
 				return false;
 			} else {
 				var b = 1;
 				var i = 1;
 				var index = 0;
 				while (b != 0 && i < line.length) {
-					if (line[i] == '(') {
+					if (line.toArray()[i] == '(') {
 						b++;
 					}
-					if (line[i] == ')') {
+					if (line.toArray()[i] == ')') {
 						b--;
 					}
 					if (b == 0 && index == 0) {
@@ -875,10 +875,10 @@ AT_KRL_Parser.prototype.getToNextLogicOperation = function (subline, sNames, ind
 	while ((!isOperation(subline, sNames, i) || isOperation(subline, sNames, i) && bracket != 0) && i < subline.length - 1) {
 		i++;
 		o = isOperation(subline, sNames, i);
-		if (subline[i] == "(") {
+		if (subline.toArray()[i] == "(") {
 			bracket++;
 		}
-		if (subline[i] == ")") {
+		if (subline.toArray()[i] == ")") {
 			bracket--;
 		}
 	}
@@ -926,17 +926,17 @@ AT_KRL_Parser.prototype.getLogicSingByName = function (name) {
 
 AT_KRL_Parser.prototype.getLogicOperationSides = function (subline, operation, index) {
 	function isInBrackets(line) {
-		if (line[0] != '(') {
+		if (line.toArray()[0] != '(') {
 			return false;
 		} else {
 			var b = 1;
 			var i = 1;
 			var index = 0;
 			while (b != 0 && i < line.length) {
-				if (line[i] == '(') {
+				if (line.toArray()[i] == '(') {
 					b++;
 				}
-				if (line[i] == ')') {
+				if (line.toArray()[i] == ')') {
 					b--;
 				}
 				if (b == 0 && index == 0) {
@@ -972,17 +972,17 @@ AT_KRL_Parser.prototype.getLogicOperationSides = function (subline, operation, i
 
 AT_KRL_Parser.prototype.getLogicExpressionTree = function (subline) {
 	function isInBrackets(line) {
-		if (line[0] != '(') {
+		if (line.toArray()[0] != '(') {
 			return false;
 		} else {
 			var b = 1;
 			var i = 1;
 			var index = 0;
 			while (b != 0 && i < line.length) {
-				if (line[i] == '(') {
+				if (line.toArray()[i] == '(') {
 					b++;
 				}
-				if (line[i] == ')') {
+				if (line.toArray()[i] == ')') {
 					b--;
 				}
 				if (b == 0 && index == 0) {
@@ -1131,13 +1131,13 @@ AT_KRL_Parser.prototype.parseRuleConditionsFL = function (lines) {
 	return this.parseRuleConditions(line);
 }
 
-AT_KRL_Parser.prototype.sideHasNoObject = function(side){
-	if (typeof(side) == "number" || typeof(side) == "string"){
+AT_KRL_Parser.prototype.sideHasNoObject = function (side) {
+	if (typeof(side) == "number" || typeof(side) == "string") {
 		return true;
 	}
-	if (side.expressions){
+	if (side.expressions) {
 		var res = true;
-		for (var i = 0; i < side.expressions.length; i++){
+		for (var i = 0; i < side.expressions.length; i++) {
 			res = res && this.sideHasNoObject(side.expressions[i]);
 		}
 		return res;
@@ -1145,11 +1145,11 @@ AT_KRL_Parser.prototype.sideHasNoObject = function(side){
 	return false;
 }
 
-AT_KRL_Parser.prototype.sideIsOnlyObject = function(side){
-	if (side.object && side.aIndex != null && side.object.attributes[side.aIndex]){
+AT_KRL_Parser.prototype.sideIsOnlyObject = function (side) {
+	if (side.object && side.aIndex != null && side.object.attributes[side.aIndex]) {
 		return true;
 	}
-	if (side.expressions && side.expressions.length == 1){
+	if (side.expressions && side.expressions.length == 1) {
 		return this.sideIsOnlyObject(side.expressions[0]);
 	}
 	return false;
@@ -1246,5 +1246,3 @@ AT_KRL_Parser.prototype.parseDeclaration = function (declaration) {
 		throw new SyntaxError('Некорректное объявление:\n' + declaration + '\nСтрока 0');
 	}
 }
-
-
