@@ -781,7 +781,19 @@ AT_KRL_Parser.prototype.parseMathFact = function (line) {
 	var eq = line.indexOf(rel);
 
 	var l = line.substring(0, eq);
+	while (l.charAt(0) == '"'){
+		l = l.slice(1);
+	}
+	while (l.charAt(l.length - 1) == '"'){
+		l = l.slice(0, l.length - 1);
+	}
 	var r = line.substring(eq + rel.length, line.lastIndexOf(' УВЕРЕННОСТЬ ['));
+	while (r.charAt(0) == '"'){
+		r = r.slice(1);
+	}
+	while (r.charAt(r.length - 1) == '"'){
+		r = r.slice(0, r.length - 1);
+	}
 
 	var left = this.parseMathExpression(l);
 	var right = this.parseMathExpression(r);
