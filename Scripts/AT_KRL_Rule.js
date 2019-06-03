@@ -163,6 +163,6 @@ AT_KRL_Rule.prototype.getKRL = function () {
 			res += this.elsresult[i].getKRL() + '\n';
 		}
 	}
-	res += "КОММЕНТАРИЙ " + this.comment;
+	res += "КОММЕНТАРИЙ " + this.comment + '\n\n';
 	return res;
 };
