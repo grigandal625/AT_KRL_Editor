@@ -8,8 +8,8 @@ var XMLDom = function (XMLString) {
         this.creator = x;
         this.XMLControl = x.documentElement;
     } else {
-        this.creator = DOMParser().parseFromString(XMLString);
-        this.XMLControl = new DOMParser().parseFromString(XMLString).documentElement;
+        this.creator = new DOMParser().parseFromString(XMLString, 'text/xml');
+        this.XMLControl = new DOMParser().parseFromString(XMLString, 'text/xml').documentElement;
     }
     this.parentNode = null;
 };

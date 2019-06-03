@@ -14,14 +14,17 @@ AT_KRL_Editor.prototype.getAllTypes = function () {
 	return [{
 			"id": 0,
 			"name": ["ЧИСЛО"],
+			"meta": "number",
 			"type": "number"
 		}, {
 			"id": 1,
 			"name": ["СИМВОЛ"],
+			"meta": "string",
 			"type": "string"
 		}, {
 			"id": 2,
 			"name": ["СИМВОЛ", "НЕЧЕТКИЙ"],
+			"meta": "fuzzy",
 			"type": "string"
 		}
 	];

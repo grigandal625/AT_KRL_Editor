@@ -88,3 +88,12 @@ AT_KRL_Type.prototype.isValidValue = function (v) {
 	}
 	return false;
 }
+
+AT_KRL_Type.prototype.toXML = function(){
+	var Doc = new XMLDom('<type/>');
+	Doc.setAttribute('id',this.name)
+	Doc.setAttribute('meta',this.getAllTypes()[this.vType].meta);
+	Doc.setAttribute('desc',this.comment);
+
+	return Doc.XML();
+}
