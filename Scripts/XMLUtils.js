@@ -38,7 +38,7 @@ XMLDom.prototype.findParentNode = function (doc) {
             if (this.ActiveXMode) {
                 res = new XMLDom(doc.parentNode.xml);
             } else {
-                res = XMLDom(new XMLSerializer().serializeToString(doc.parentNode));
+                res = new XMLDom(new XMLSerializer().serializeToString(doc.parentNode));
             }
             res.parentNode = this.findParentNode(doc.parentNode);
         }
@@ -56,7 +56,7 @@ XMLDom.prototype.appendChild = function (Node) {
     if (this.ActiveXMode) {
         res = new XMLDom(child.xml);
     } else {
-        res = XMLDom(new XMLSerializer().serializeToString(child));
+        res = new XMLDom(new XMLSerializer().serializeToString(child));
     }
     res.parentNode = this;
     return res;

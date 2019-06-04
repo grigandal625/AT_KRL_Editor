@@ -2,14 +2,26 @@ var AT_KRL_StFzExpression = function (object, aIndex) {
 	if (object.attributes[aIndex].type.vType != 1 && object.attributes[aIndex].type.vType != 2) {
 		throw new Error('Type of attributes must be string or fuzzy');
 	}
-	this.expressions = [{}
-	];
+	this.expressions = [{}];
 	this.expressions[0].object = object;
 	this.expressions[0].aIndex = aIndex;
 }
 
 AT_KRL_StFzExpression.prototype.getKRL = function () {
 	return (this.expressions[0].object.name) + '.' + (this.expressions[0].object.attributes[this.expressions[0].aIndex].name);
+}
+
+AT_KRL_StFzExpression.prototype.hasObjAttrRef = function (name, index, deep) {
+	return (this.expressions[0].object.name == name && this.expressions[0].aIndex == index);
+}
+
+AT_KRL_StFzExpression.prototype.toXML = function () {
+	var r1 = new XMLDom('<ref />')
+	r1.setAttribute('id', this.expressions[0].object.name);
+	var r2 = new XMLDom('<ref />');
+	r2.setAttribute('id', this.expressions[0].object.attributes[this.expressions[0].aIndex].name);
+	r1.appendChild(r2);
+	return r1.XML();
 }
 
 var AT_KRL_MathExpression = function (es, sing) {
@@ -58,7 +70,7 @@ var AT_KRL_MathExpression = function (es, sing) {
 }
 
 AT_KRL_MathExpression.prototype.isNumber = function (ex) {
-	if (typeof(ex) == "number") {
+	if (typeof (ex) == "number") {
 		return true;
 	}
 	if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && ex.object.attributes[ex.aIndex].type.vType == 0) {
@@ -75,665 +87,664 @@ AT_KRL_MathExpression.prototype.isNumber = function (ex) {
 
 AT_KRL_MathExpression.prototype.getAllSings = function () {
 	return [{
-			"sing": null,
-			"pos": 2,
-			"type": [],
-			"priority": null,
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
+		"sing": null,
+		"pos": 2,
+		"type": [],
+		"priority": null,
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
 				}
-				if (es.length == 1) {
-					return getExpressionValue(es[0]);
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
 				}
 			}
-		}, {
-			"sing": "-",
-			"pos": 2,
-			"type": ["bin", "coef"],
-			"priority": [0],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return -getExpressionValue(es[0]);
-				}
-				if (es.length == 2) {
-					return getExpressionValue(es[0]) - getExpressionValue(es[1]);
-				}
-			}
-		}, {
-			"sing": "+",
-			"pos": Infinity,
-			"type": ["bin"],
-			"priority": [0],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				var res = 0;
-				for (var i = 0; i < es.length; i++) {
-					res += getExpressionValue(es[i]);
-				}
-				return res;
-			}
-		}, {
-			"sing": "/",
-			"pos": 2,
-			"type": ["bin"],
-			"priority": [1],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 2) {
-					return getExpressionValue(es[0]) / getExpressionValue(es[1]);
-				}
-			}
-		}, {
-			"sing": "*",
-			"pos": Infinity,
-			"type": ["bin"],
-			"priority": [1],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				var res = 1;
-				for (var i = 0; i < es.length; i++) {
-					res = res * getExpressionValue(es[i]);
-				}
-				return res;
-			}
-		}, {
-			"sing": "^",
-			"pos": 2,
-			"type": ["bin"],
-			"priority": [1],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 2) {
-					return Math.pow(getExpressionValue(es[0]), getExpressionValue(es[1]));
-				}
-			}
-		}, {
-			"sing": "sin",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.sin(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "cos",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.cos(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "tan",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.tan(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "ctan",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.ctan(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "asin",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.asin(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "acos",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.acos(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "atan",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.atan(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "actan",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.actan(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "sinh",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.sinh(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "cosh",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.cosh(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "tanh",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.tanh(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "ctanh",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.ctanh(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "asinh",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.asinh(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "acosh",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.acosh(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "atanh",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.atanh(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "actanh",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.actanh(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "exp",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.exp(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "log",
-			"pos": 2,
-			"type": ["bin", "op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 2) {
-					return Math.logb(getExpressionValue(es[1]), getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "lg",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.logb(10, getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "ln",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.logb(Math.E, getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "sqrt",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.sqrt(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "abs",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.abs(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "sign",
-			"pos": 1,
-			"type": ["op"],
-			"priority": [2],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 1) {
-					return Math.sign(getExpressionValue(es[0]));
-				}
-			}
-		}, {
-			"sing": "div",
-			"pos": 2,
-			"type": ["bin"],
-			"priority": [1],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 2) {
-					return parseInt(getExpressionValue(es[0]) / getExpressionValue(es[1]));
-				}
-			}
-		}, {
-			"sing": "mod",
-			"pos": 2,
-			"type": ["bin"],
-			"priority": [1],
-			"calc": function (es) {
-				function getExpressionValue(ex) {
-					if (typeof(ex) == "number") {
-						return ex;
-					}
-					if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof(ex.object.attributes[ex.aIndex].value) == "number") {
-						return ex.object.attributes[ex.aIndex].value;
-					}
-					if (ex.expressions) {
-						return ex.calculate();
-					}
-				}
-				if (es.length == 2) {
-					return parseInt(getExpressionValue(es[0]) % getExpressionValue(es[1]));
-				}
+			if (es.length == 1) {
+				return getExpressionValue(es[0]);
 			}
 		}
-	]
+	}, {
+		"sing": "-",
+		"pos": 2,
+		"type": ["bin", "coef"],
+		"priority": [0],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return -getExpressionValue(es[0]);
+			}
+			if (es.length == 2) {
+				return getExpressionValue(es[0]) - getExpressionValue(es[1]);
+			}
+		}
+	}, {
+		"sing": "+",
+		"pos": Infinity,
+		"type": ["bin"],
+		"priority": [0],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			var res = 0;
+			for (var i = 0; i < es.length; i++) {
+				res += getExpressionValue(es[i]);
+			}
+			return res;
+		}
+	}, {
+		"sing": "/",
+		"pos": 2,
+		"type": ["bin"],
+		"priority": [1],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 2) {
+				return getExpressionValue(es[0]) / getExpressionValue(es[1]);
+			}
+		}
+	}, {
+		"sing": "*",
+		"pos": Infinity,
+		"type": ["bin"],
+		"priority": [1],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			var res = 1;
+			for (var i = 0; i < es.length; i++) {
+				res = res * getExpressionValue(es[i]);
+			}
+			return res;
+		}
+	}, {
+		"sing": "^",
+		"pos": 2,
+		"type": ["bin"],
+		"priority": [1],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 2) {
+				return Math.pow(getExpressionValue(es[0]), getExpressionValue(es[1]));
+			}
+		}
+	}, {
+		"sing": "sin",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.sin(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "cos",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.cos(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "tan",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.tan(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "ctan",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.ctan(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "asin",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.asin(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "acos",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.acos(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "atan",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.atan(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "actan",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.actan(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "sinh",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.sinh(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "cosh",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.cosh(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "tanh",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.tanh(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "ctanh",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.ctanh(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "asinh",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.asinh(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "acosh",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.acosh(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "atanh",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.atanh(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "actanh",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.actanh(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "exp",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.exp(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "log",
+		"pos": 2,
+		"type": ["bin", "op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 2) {
+				return Math.logb(getExpressionValue(es[1]), getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "lg",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.logb(10, getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "ln",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.logb(Math.E, getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "sqrt",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.sqrt(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "abs",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.abs(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "sign",
+		"pos": 1,
+		"type": ["op"],
+		"priority": [2],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 1) {
+				return Math.sign(getExpressionValue(es[0]));
+			}
+		}
+	}, {
+		"sing": "div",
+		"pos": 2,
+		"type": ["bin"],
+		"priority": [1],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 2) {
+				return parseInt(getExpressionValue(es[0]) / getExpressionValue(es[1]));
+			}
+		}
+	}, {
+		"sing": "mod",
+		"pos": 2,
+		"type": ["bin"],
+		"priority": [1],
+		"calc": function (es) {
+			function getExpressionValue(ex) {
+				if (typeof (ex) == "number") {
+					return ex;
+				}
+				if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes && ex.object.attributes[ex.aIndex] && typeof (ex.object.attributes[ex.aIndex].value) == "number") {
+					return ex.object.attributes[ex.aIndex].value;
+				}
+				if (ex.expressions) {
+					return ex.calculate();
+				}
+			}
+			if (es.length == 2) {
+				return parseInt(getExpressionValue(es[0]) % getExpressionValue(es[1]));
+			}
+		}
+	}]
 }
 
 AT_KRL_MathExpression.prototype.getThisSing = function () {
@@ -748,6 +759,7 @@ AT_KRL_MathExpression.prototype.getThisSing = function () {
 AT_KRL_MathExpression.prototype.getKRL = function () {
 	var sing = this.getThisSing();
 	var res = '';
+
 	function chKRL(ex) {
 		var res = '';
 		if (ex.object && ex.hasOwnProperty('aIndex') && ex.object.attributes[ex.aIndex] && AT_KRL_MathExpression.prototype.isNumber(ex)) {
@@ -756,7 +768,7 @@ AT_KRL_MathExpression.prototype.getKRL = function () {
 		if (ex.expressions && ex.getThisSing()) {
 			res += ex.getKRL();
 		}
-		if (typeof(ex) == 'number') {
+		if (typeof (ex) == 'number') {
 			res += ex.toString();
 		}
 		return res;
@@ -788,4 +800,34 @@ AT_KRL_MathExpression.prototype.getKRL = function () {
 AT_KRL_MathExpression.prototype.calculate = function () {
 	var sing = this.getThisSing();
 	return sing.calc(this.expressions);
+}
+
+AT_KRL_MathExpression.prototype.hasObjAttrRef = function (name, index, deep) {
+	if (this.expressions.length == 1 && !deep) {
+		if (this.expressions[0].hasOwnProperty('object') && this.expressions[0].hasOwnProperty('aIndex')) {
+			return (this.expressions[0].object.name == name && this.expressions[0].aIndex == index) && (this.sing == null);
+		} else
+		if (this.expressions[0].expressions) {
+			return this.expressions[0].hasObjAttrRef(name, index, deep) && (this.sing == null);
+		}
+	}
+	if (deep) {
+		var res = false;
+		for (var i = 0; i < this.expressions.length; i++) {
+			if (this.expressions[i].hasOwnProperty('object') && this.expressions[0].hasOwnProperty('aIndex')) {
+				res = res || (this.expressions[i].object.name == name && this.expressions[i].aIndex == index);
+			} else
+			if (this.expressions[i].expressions) {
+				res = res || this.expressions[i].hasObjAttrRef(name, index, deep);
+			}
+		}
+		return res;
+	}
+	return false;
+}
+
+AT_KRL_MathExpression.prototype.toXML = function(){
+	var tmp = new XMLDom('<tmp />');
+	tmp.setText(this.getKRL());
+	return tmp.XML();
 }

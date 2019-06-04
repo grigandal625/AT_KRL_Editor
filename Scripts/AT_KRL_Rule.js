@@ -15,6 +15,14 @@ AT_KRL_ConditionNot.prototype.calculate = function () {
 	return !(this.condition[0].calculate());
 }
 
+AT_KRL_ConditionNot.prototype.toXML = function(){
+	var not = new XMLDom('<not />')
+	for (var i = 0; i < this.condition.length; i++){
+		not.appendChild(new XMLDom(this.condition[i].toXML()));
+	}
+	return not.XML();
+}
+
 var AT_KRL_ConditionOr = function (cs) {
 	if (cs && cs.length >= 2) {
 		this.condition = cs;
@@ -37,6 +45,14 @@ AT_KRL_ConditionOr.prototype.calculate = function () {
 		res = res || this.condition[i].calculate();
 	}
 	return res;
+}
+
+AT_KRL_ConditionOr.prototype.toXML = function(){
+	var or = new XMLDom('<or />')
+	for (var i = 0; i < this.condition.length; i++){
+		or.appendChild(new XMLDom(this.condition[i].toXML()));
+	}
+	return or.XML();
 }
 
 var AT_KRL_ConditionAnd = function (cs) {
@@ -63,8 +79,17 @@ AT_KRL_ConditionAnd.prototype.calculate = function () {
 	return res;
 }
 
+AT_KRL_ConditionAnd.prototype.toXML = function(){
+	var and = new XMLDom('<and />')
+	for (var i = 0; i < this.condition.length; i++){
+		and.appendChild(new XMLDom(this.condition[i].toXML()));
+	}
+	return and.XML();
+}
+
 var AT_KRL_Rule = function (a, cs, fs, n, e) {
 	var self = this;
+
 	function validateResult(fs) {
 		var r = fs.result ? (fs.result.length ? fs.result : [fs.result]) : (fs.length ? fs : [fs]);
 		var res = true;
@@ -105,6 +130,7 @@ var AT_KRL_Rule = function (a, cs, fs, n, e) {
 		this.result = fs.result ? (fs.result.length ? fs.result : [fs.result]) : (fs.length ? fs : [fs]);
 		this.elsresult = fs.elsresult ? (fs.elsresult.length ? fs.elsresult : [fs.elsresult]) : [];
 		e.pushRule(this);
+		this.editor = e;
 	} else {
 		throw new Error('Wrong format of parameters to create rule, condition must have two expressions in minimum');
 	}
@@ -121,7 +147,7 @@ AT_KRL_Rule.prototype.conditionHasTwoSides = function (cs) {
 }
 
 AT_KRL_Rule.prototype.sideHasNoObject = function (side) {
-	if (typeof(side) == "number" || typeof(side) == "string") {
+	if (typeof (side) == "number" || typeof (side) == "string") {
 		return true;
 	}
 	if (side.expressions) {
@@ -166,3 +192,56 @@ AT_KRL_Rule.prototype.getKRL = function () {
 	res += "КОММЕНТАРИЙ " + this.comment + '\n\n';
 	return res;
 };
+
+AT_KRL_Rule.prototype.hasObjAttrRef = function (name, index, deep) {
+	if (!deep) {
+		var res = false;
+		var facts = this.result.concat(this.elsresult);
+		for (var i = 0; i < facts.length; i++) {
+			res = res || facts[i].hasObjAttrRef(name, index, deep);
+		}
+		return res;
+	} else {
+		var KRL = this.getKRL();
+		var obj;
+		for (var i = 0; i < this.editor.objects.length; i++) {
+			var o = this.editor.objects[i];
+			if (name == o.name) {
+				obj = o;
+				break;
+			}
+		}
+		var aName = obj.attributes[index].name;
+		return (KRL.indexOf(name + '.' + aName) != -1);
+	}
+}
+
+AT_KRL_Rule.prototype.toXML = function (index) {
+	var num = index || 0;
+	var rule = new XMLDom('<rule />');
+	rule.setAttribute('id',(num+1).toString());
+	rule.setAttribute('meta','simple');
+	rule.setAttribute('desc',this.comment);
+	var condition = new XMLDom('<condition />');
+	condition.appendChild(new XMLDom(this.ifConds.toXML()));
+	rule.appendChild(condition);
+
+	var action = new XMLDom('<action />');
+	for (var i = 0; i < this.result.length; i++) {
+		var assign = new XMLDom('<assign />');
+		assign.appendChild(new XMLDom(this.result[i].toXML()));
+		action.appendChild(assign);
+	}
+	rule.appendChild(action);
+
+	if (this.elsresult.length != 0) {
+		var elseAction = new XMLDom('<else-action />');
+		for (var i = 0; i < this.elsresult.length; i++) {
+			var assign = new XMLDom('<assign />');
+			assign.appendChild(new XMLDom(this.elsresult[i].toXML()));
+			elseAction.appendChild(assign);
+		}
+		rule.appendChild(elseAction);
+	}
+	return rule.XML();
+}

@@ -85,17 +85,17 @@ AT_KRL_Parser.prototype.parseTypeParentFL = function (lines) {
 	for (var i = 0; i < lines.length; i++) {
 		var l = lines[i];
 		switch (l) {
-		case "ЧИСЛО":
-			res = 0;
-			break;
-		case "СИМВОЛ":
-			res = 1;
-			break;
-		case "НЕЧЕТКИЙ":
-			res = 2;
-			break;
-		default:
-			break;
+			case "ЧИСЛО":
+				res = 0;
+				break;
+			case "СИМВОЛ":
+				res = 1;
+				break;
+			case "НЕЧЕТКИЙ":
+				res = 2;
+				break;
+			default:
+				break;
 		}
 		err += l + "\n";
 	}
@@ -228,52 +228,52 @@ AT_KRL_Parser.prototype.parseTypeParamsFL = function (lines, p) {
 		"values": []
 	};
 	switch (p) {
-	case 0:
-		var v = [parseFloat(lines[lines.indexOf("ЧИСЛО") + 1].replace('ОТ ', '').replaceAll(',', '.')), parseFloat(lines[lines.indexOf("ЧИСЛО") + 2].replace('ДО ', '').replaceAll(',', '.'))];
-		if (isNaN(v[0]) || isNaN(v[1])) {
-			throw new SyntaxError('Несовпадение типа и значений в объявлении:\n' + this.getTextFromLines(lines));
-		};
-		res.values = v;
-		return res;
-	case 1:
-		var v = [];
-		for (var i = lines.indexOf("СИМВОЛ") + 1; i < lines.length; i++) {
-			if (lines[i].indexOf('КОММЕНТАРИЙ ') != 0) {
+		case 0:
+			var v = [parseFloat(lines[lines.indexOf("ЧИСЛО") + 1].replace('ОТ ', '').replaceAll(',', '.')), parseFloat(lines[lines.indexOf("ЧИСЛО") + 2].replace('ДО ', '').replaceAll(',', '.'))];
+			if (isNaN(v[0]) || isNaN(v[1])) {
+				throw new SyntaxError('Несовпадение типа и значений в объявлении:\n' + this.getTextFromLines(lines));
+			};
+			res.values = v;
+			return res;
+		case 1:
+			var v = [];
+			for (var i = lines.indexOf("СИМВОЛ") + 1; i < lines.length; i++) {
+				if (lines[i].indexOf('КОММЕНТАРИЙ ') != 0) {
+					if (lines[i].slice(0, 1) != '"' || lines[i].slice(lines[i].length - 1) != '"') {
+						throw new SyntaxError('Неверный синтаксис задания символьного значения в объявлении:\n' + this.getTextFromLines(lines) + '\nСтрока: ' + i);
+					}
+					v.push(lines[i].slice(1, lines[i].length - 1));
+				}
+			}
+			res.values = v;
+			return res;
+			break;
+		case 2:
+			var v = [];
+			var i = lines.indexOf("СИМВОЛ") + 1;
+			var j = lines.indexOf("НЕЧЕТКИЙ");
+			if (j == -1 || i == 0) {
+				throw new SyntaxError('Неверный синтаксис задания нечеткого типа в объявлении:\n' + this.getTextFromLines(lines) + '\nСтрока: ' + 0);
+			}
+			while (i < j) {
 				if (lines[i].slice(0, 1) != '"' || lines[i].slice(lines[i].length - 1) != '"') {
 					throw new SyntaxError('Неверный синтаксис задания символьного значения в объявлении:\n' + this.getTextFromLines(lines) + '\nСтрока: ' + i);
 				}
 				v.push(lines[i].slice(1, lines[i].length - 1));
+				i++;
 			}
-		}
-		res.values = v;
-		return res;
-		break;
-	case 2:
-		var v = [];
-		var i = lines.indexOf("СИМВОЛ") + 1;
-		var j = lines.indexOf("НЕЧЕТКИЙ");
-		if (j == -1 || i == 0) {
-			throw new SyntaxError('Неверный синтаксис задания нечеткого типа в объявлении:\n' + this.getTextFromLines(lines) + '\nСтрока: ' + 0);
-		}
-		while (i < j) {
-			if (lines[i].slice(0, 1) != '"' || lines[i].slice(lines[i].length - 1) != '"') {
-				throw new SyntaxError('Неверный синтаксис задания символьного значения в объявлении:\n' + this.getTextFromLines(lines) + '\nСтрока: ' + i);
+			if (parseInt(lines[j + 1]) != v.length) {
+				throw new SyntaxError('Несовпадение количества значений типа и количества функций принадлежности в объявлении:\n' + this.getTextFromLines(lines) + '\nСтрока: ' + (j + 1));
 			}
-			v.push(lines[i].slice(1, lines[i].length - 1));
-			i++;
-		}
-		if (parseInt(lines[j + 1]) != v.length) {
-			throw new SyntaxError('Несовпадение количества значений типа и количества функций принадлежности в объявлении:\n' + this.getTextFromLines(lines) + '\nСтрока: ' + (j + 1));
-		}
-		var pos = j + 2;
-		var FP = [];
-		for (var i = 0; i < v.length; i++) {
-			FP.push(this.parseFP(lines[pos + i], v));
-		}
-		res.values = v;
-		res.FP = FP;
-		return res;
-		break;
+			var pos = j + 2;
+			var FP = [];
+			for (var i = 0; i < v.length; i++) {
+				FP.push(this.parseFP(lines[pos + i], v));
+			}
+			res.values = v;
+			res.FP = FP;
+			return res;
+			break;
 	}
 }
 
@@ -372,7 +372,7 @@ AT_KRL_Parser.prototype.parseObject = function (declaration) {
 	var name = this.parseObjectNameFL(lines);
 	var attributes = this.parseObjectAttributesFl(lines);
 	var comment = this.parseCommentFL(lines)
-		var object = new AT_KRL_Object(name, attributes, comment, this.editor);
+	var object = new AT_KRL_Object(name, attributes, comment, this.editor);
 	return object;
 }
 
@@ -438,9 +438,9 @@ AT_KRL_Parser.prototype.parseSimpleMathExpression = function (subline) {
 		throw new SyntaxError('Атрибут ' + obj + '.' + att + ' имеет недопустимый тип\nОжидался числовой тип атрибута');
 	}
 	var m = new AT_KRL_MathExpression({
-			object: object,
-			aIndex: aIndex
-		});
+		object: object,
+		aIndex: aIndex
+	});
 	return m;
 }
 
@@ -700,12 +700,23 @@ AT_KRL_Parser.prototype.parseStFzFact = function (line) {
 	if (line.indexOf('"') == 0) {
 		throw new SyntaxError('Невозможно получить факт из объявления:\n' + line + '\nЕсли в выражении присутствует строка, то в левой части выражения должен быть объект и атрибут, а строка в правой');
 	}
-	if (line.indexOf('=') == -1) {
-		throw new SyntaxError('Невозможно получить факт из объявления:\n' + line + '\nВыражения для символьных и нечетких значений должны сравниваться только знаком "="')
+	if (line.indexOf('=') == -1 && line.indexOf('<') == -1 && line.indexOf('>') == -1) {
+		throw new SyntaxError('Невозможно получить факт из объявления:\n' + line + '\nВыражения для символьных и нечетких значений должны сравниваться знаками "=", "<" и ">"')
 	}
-	var eq = line.indexOf('=');
+	var sings = ['=', '<', '>', '>=', '<='];
+	var eq = -1;
+	var sing = '=';
+	for (var i = 0; i < sings.length; i++) {
+		var tmp = line.indexOf(sings[i]);
+		if (tmp != -1) {
+			if ((tmp <= eq || eq == -1) && (sings[i].length == 1 || (sings[i].length == 2) && (tmp + 1 == line.indexOf('=')))) {
+				eq = tmp;
+				sing = sings[i];
+			}
+		}
+	}
 	var l = line.substring(0, eq);
-	var r = line.substring(eq + 1, line.lastIndexOf(' УВЕРЕННОСТЬ ['));
+	var r = line.substring(eq + sing.length, line.lastIndexOf(' УВЕРЕННОСТЬ ['));
 
 	var left = this.parseStFzExpression(l);
 	var right = this.parseStFzExpression(r);
@@ -731,7 +742,7 @@ AT_KRL_Parser.prototype.parseStFzFact = function (line) {
 			if (sr.length != 2) {
 				return ' Невозможно получить значение уверенности в объявлении:\n' + s + '\nТребуемый формат: УВЕРЕННОСТЬ [число >=0, число >=0] ТОЧНОСТЬ число >=0';
 			}
-			if (typeof(sr[0]) != 'number' || typeof(sr[1]) != 'number') {
+			if (typeof (sr[0]) != 'number' || typeof (sr[1]) != 'number') {
 				return ' Невозможно получить значение уверенности в объявлении:\n' + s + '\nТребуемый формат: УВЕРЕННОСТЬ [число >=0, число >=0] ТОЧНОСТЬ число >=0';
 			}
 		} catch (e) {
@@ -760,7 +771,7 @@ AT_KRL_Parser.prototype.parseStFzFact = function (line) {
 	var sure = JSON.parse(s);
 
 	var exact = parseFloat(ExSu.substring(ExSu.indexOf('] ТОЧНОСТЬ ') + ('] ТОЧНОСТЬ ').length, ExSu.length).replaceAll(',', '.'));
-	var f = new AT_KRL_Fact(left, right, '=', sure, exact);
+	var f = new AT_KRL_Fact(left, right, sing, sure, exact);
 	return f;
 }
 
@@ -768,6 +779,7 @@ AT_KRL_Parser.prototype.parseMathFact = function (line) {
 	while (line.indexOf(' ') == 0) {
 		line = line.slice(1);
 	}
+
 	function getRel(line) {
 		var s = ['<=', '>=', '<', '>', '='];
 		for (var i = 0; i < s.length; i++) {
@@ -781,17 +793,17 @@ AT_KRL_Parser.prototype.parseMathFact = function (line) {
 	var eq = line.indexOf(rel);
 
 	var l = line.substring(0, eq);
-	while (l.charAt(0) == '"'){
+	while (l.charAt(0) == '"') {
 		l = l.slice(1);
 	}
-	while (l.charAt(l.length - 1) == '"'){
+	while (l.charAt(l.length - 1) == '"') {
 		l = l.slice(0, l.length - 1);
 	}
 	var r = line.substring(eq + rel.length, line.lastIndexOf(' УВЕРЕННОСТЬ ['));
-	while (r.charAt(0) == '"'){
+	while (r.charAt(0) == '"') {
 		r = r.slice(1);
 	}
-	while (r.charAt(r.length - 1) == '"'){
+	while (r.charAt(r.length - 1) == '"') {
 		r = r.slice(0, r.length - 1);
 	}
 
@@ -819,7 +831,7 @@ AT_KRL_Parser.prototype.parseMathFact = function (line) {
 			if (sr.length != 2) {
 				return ' Невозможно получить значение уверенности в объявлении:\n' + s + '\nТребуемый формат: УВЕРЕННОСТЬ [число >=0, число >=0] ТОЧНОСТЬ число >=0';
 			}
-			if (typeof(sr[0]) != 'number' || typeof(sr[1]) != 'number') {
+			if (typeof (sr[0]) != 'number' || typeof (sr[1]) != 'number') {
 				return ' Невозможно получить значение уверенности в объявлении:\n' + s + '\nТребуемый формат: УВЕРЕННОСТЬ [число >=0, число >=0] ТОЧНОСТЬ число >=0';
 			}
 		} catch (e) {
@@ -891,7 +903,7 @@ AT_KRL_Parser.prototype.getToNextLogicOperation = function (subline, sNames, ind
 		}
 		var res = false;
 		for (var k = 0; k < n.length; k++) {
-			res = (res || ((s.indexOf(n[k], i) == i) && (n.indexOf(s.substr(i, n[k].length + 1)) == -1))) && (s.lastIndexOf(')') > s.lastIndexOf('УВЕРЕННОСТЬ') || s.lastIndexOf(')') == -1);
+			res = (res || ((s.indexOf(n[k], i) == i) && (n.indexOf(s.substr(i, n[k].length + 1)) == -1))) //&& (s.lastIndexOf(')') > s.lastIndexOf('УВЕРЕННОСТЬ') || s.lastIndexOf(')') == -1);
 			if (res) {
 				return n[k];
 			}
@@ -924,22 +936,21 @@ AT_KRL_Parser.prototype.getToFirstLogicOperation = function (subline, sNames) {
 
 AT_KRL_Parser.prototype.getAllLogicSings = function () {
 	return [{
-			"sing": "~",
-			"pos": 1,
-			"type": ["coef"],
-			"priority": [0]
-		}, {
-			"sing": "|",
-			"pos": Infinity,
-			"type": ["bin"],
-			"priority": [0]
-		}, {
-			"sing": "&",
-			"pos": Infinity,
-			"type": ["bin"],
-			"priority": [1]
-		}
-	]
+		"sing": "~",
+		"pos": 1,
+		"type": ["coef"],
+		"priority": [1]
+	}, {
+		"sing": "|",
+		"pos": Infinity,
+		"type": ["bin"],
+		"priority": [0]
+	}, {
+		"sing": "&",
+		"pos": Infinity,
+		"type": ["bin"],
+		"priority": [1]
+	}]
 }
 
 AT_KRL_Parser.prototype.getLogicSingByName = function (name) {
@@ -1101,30 +1112,30 @@ AT_KRL_Parser.prototype.getConditionFromTree = function (root) {
 	}
 	var s = root.operation.sing;
 	switch (s) {
-	case '~':
-		if (cs.length == 1) {
-			return new AT_KRL_ConditionNot(cs[0]);
-		} else {
-			throw new SyntaxError('Логический оператор "~" должен иметь единственный член');
-		}
-		break;
-	case '&':
-		if (cs.length == 2) {
-			return new AT_KRL_ConditionAnd(cs);
-		} else {
-			throw new SyntaxError('Логический оператор "&" должен иметь минимум два члена');
-		}
-		break;
-	case '|':
-		if (cs.length == 2) {
-			return new AT_KRL_ConditionOr(cs);
-		} else {
-			throw new SyntaxError('Логический оператор "|" должен иметь минимум два члена');
-		}
-		break;
-	default:
-		throw new SyntaxError('Ошибка чтения логического оператора из "' + s + '"');
-		break;
+		case '~':
+			if (cs.length == 1) {
+				return new AT_KRL_ConditionNot(cs[0]);
+			} else {
+				throw new SyntaxError('Логический оператор "~" должен иметь единственный член');
+			}
+			break;
+		case '&':
+			if (cs.length == 2) {
+				return new AT_KRL_ConditionAnd(cs);
+			} else {
+				throw new SyntaxError('Логический оператор "&" должен иметь минимум два члена');
+			}
+			break;
+		case '|':
+			if (cs.length == 2) {
+				return new AT_KRL_ConditionOr(cs);
+			} else {
+				throw new SyntaxError('Логический оператор "|" должен иметь минимум два члена');
+			}
+			break;
+		default:
+			throw new SyntaxError('Ошибка чтения логического оператора из "' + s + '"');
+			break;
 	}
 }
 
@@ -1159,7 +1170,7 @@ AT_KRL_Parser.prototype.parseRuleConditionsFL = function (lines) {
 }
 
 AT_KRL_Parser.prototype.sideHasNoObject = function (side) {
-	if (typeof(side) == "number" || typeof(side) == "string") {
+	if (typeof (side) == "number" || typeof (side) == "string") {
 		return true;
 	}
 	if (side.expressions) {
@@ -1263,13 +1274,13 @@ AT_KRL_Parser.prototype.parseDeclaration = function (declaration) {
 	var lines = this.getAllLines(declaration);
 	var decType = lines[0].slice(0, lines[0].indexOf(' ') + 1);
 	switch (decType) {
-	case 'ТИП ':
-		return this.parseType(declaration);
-	case 'ОБЪЕКТ ':
-		return this.parseObject(declaration);
-	case 'ПРАВИЛО ':
-		return this.parseRule(declaration);
-	default:
-		throw new SyntaxError('Некорректное объявление:\n' + declaration + '\nСтрока 0');
+		case 'ТИП ':
+			return this.parseType(declaration);
+		case 'ОБЪЕКТ ':
+			return this.parseObject(declaration);
+		case 'ПРАВИЛО ':
+			return this.parseRule(declaration);
+		default:
+			throw new SyntaxError('Некорректное объявление:\n' + declaration + '\nСтрока 0');
 	}
 }

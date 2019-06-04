@@ -1,7 +1,7 @@
 var AT_KRL_Fact = function (leftside, rightside, sing, sure, exact) {
 
 	function validateSides(l, r, s) {
-		var relsForString = '=';
+		var relsForString = ['>=', '<=', '<', '>', '='];
 		var relsForNumber = ['>=', '<=', '<', '>', '='];
 		var numleft = AT_KRL_MathExpression.prototype.isNumber(l);
 		var numrigth = AT_KRL_MathExpression.prototype.isNumber(r);
@@ -84,4 +84,28 @@ AT_KRL_Fact.prototype.calculate = function () {
 	var res = eval(l.toString() + s + r.toString());
 	return res;
 
+}
+
+AT_KRL_Fact.prototype.hasObjAttrRef = function(name, index, deep){
+	if (!deep && this.leftside.expressions){
+		return (this.leftside.hasObjAttrRef(name,index,deep))
+	}
+	if (deep){
+		return (this.leftside.hasObjAttrRef(name,index,deep) || this.rightside.hasObjAttrRef(name,index,deep))
+	}
+}
+
+AT_KRL_Fact.prototype.toXML = function(){
+	var xmlSing = {"=":"eq","<":"lt",">":"gt","<=":"le",">=":"ge"}[this.sing];
+	var sg = new XMLDom('<' + xmlSing + ' />');
+	var l = new XMLDom(this.leftside.toXML());
+	var r = new XMLDom(this.rightside.toXML());
+	sg.appendChild(l);
+	sg.appendChild(r);
+	var wh = new XMLDom('<with />')
+	wh.setAttribute('belief',this.shure[0].toString());
+	wh.setAttribute('probability',this.shure[1].toString()); 
+	wh.setAttribute('accuracy',this.exact.toString());
+	sg.appendChild(wh);
+	return sg.XML();
 }

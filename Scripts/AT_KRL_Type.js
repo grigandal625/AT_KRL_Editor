@@ -46,54 +46,90 @@ AT_KRL_Type.prototype.getFPKRL = function (f) {
 AT_KRL_Type.prototype.getKRL = function () {
 	var res = "ТИП " + this.name + "\n" + this.getAllTypes()[this.vType].name[0] + "\n";
 	switch (this.vType) {
-	case 0:
-		res += "ОТ " + this.values[0] + "\nДО " + this.values[1] + "\n";
-		break;
-	case 1:
-		for (var i = 0; i < this.values.length; i++) {
-			res += '"' + this.values[i] + '"\n';
-		}
-		break;
-	case 2:
-		for (var i = 0; i < this.values.length; i++) {
-			res += '"' + this.values[i] + '"\n';
-		}
+		case 0:
+			res += "ОТ " + this.values[0] + "\nДО " + this.values[1] + "\n";
+			break;
+		case 1:
+			for (var i = 0; i < this.values.length; i++) {
+				res += '"' + this.values[i] + '"\n';
+			}
+			break;
+		case 2:
+			for (var i = 0; i < this.values.length; i++) {
+				res += '"' + this.values[i] + '"\n';
+			}
 
-		res += 'НЕЧЕТКИЙ\n' + this.FP.length + "\n";
-		for (var i = 0; i < this.FP.length; i++) {
-			res += this.getFPKRL(this.FP[i]) + '\n';
-		}
-		break;
+			res += 'НЕЧЕТКИЙ\n' + this.FP.length + "\n";
+			for (var i = 0; i < this.FP.length; i++) {
+				res += this.getFPKRL(this.FP[i]) + '\n';
+			}
+			break;
 	}
 	res += "КОММЕНТАРИЙ " + this.comment + "\n\n";
 	return res;
 }
 
 AT_KRL_Type.prototype.isValidValue = function (v) {
-	if (typeof(v) == this.getAllTypes()[this.vType].type) {
+	if (typeof (v) == this.getAllTypes()[this.vType].type) {
 		var t = this.vType;
 		switch (t) {
-		case 0:
-			return (v >= this.values[0] && v <= this.values[1]);
-			break;
-		case 1:
-			return (this.values.indexOf(v) != -1);
-			break;
-		case 2:
-			return (typeof(v) == "number" || this.values.indexOf(v) != -1);
-			break;
-		default:
-			return false;
+			case 0:
+				return (v >= this.values[0] && v <= this.values[1]);
+				break;
+			case 1:
+				return (this.values.indexOf(v) != -1);
+				break;
+			case 2:
+				return (typeof (v) == "number" || this.values.indexOf(v) != -1);
+				break;
+			default:
+				return false;
 		}
 	}
 	return false;
 }
 
-AT_KRL_Type.prototype.toXML = function(){
+AT_KRL_Type.prototype.toXML = function () {
 	var Doc = new XMLDom('<type/>');
-	Doc.setAttribute('id',this.name)
-	Doc.setAttribute('meta',this.getAllTypes()[this.vType].meta);
-	Doc.setAttribute('desc',this.comment);
-
+	Doc.setAttribute('id', this.name)
+	Doc.setAttribute('meta', this.getAllTypes()[this.vType].meta);
+	Doc.setAttribute('desc', this.comment);
+	var t = this.vType;
+	switch (t) {
+		case 0:
+			var from = Doc.createElement('from');
+			from.setText(this.values[0].toString())
+			Doc.appendChild(from);
+			var to = Doc.createElement('to');
+			to.setText(this.values[1].toString());
+			Doc.appendChild(to);
+			break;
+		case 1:
+			for (var i = 0; i < this.values.length; i++) {
+				var value = Doc.createElement('value');
+				value.setText(this.values[i]);
+				Doc.appendChild(value);
+			}
+			break;
+		case 2:
+			for (var i = 0; i < this.FP.length; i++) {
+				var parametr = Doc.createElement('parametr')
+				var value = Doc.createElement('value');
+				parametr.setAttribute('min-value',this.FP[i].min.toString());
+				parametr.setAttribute('max-value',this.FP[i].max.toString());
+				value.setText(this.FP[i].value);
+				var coordsXML = Doc.createElement('mf');
+				for (var j = 0; j < this.FP[i].coordinates.length; j++){
+					var pt = Doc.createElement('point');
+					pt.setAttribute('X',this.FP[i].coordinates[j].X.toString());
+					pt.setAttribute('Y',this.FP[i].coordinates[j].Y.toString());
+					coordsXML.appendChild(pt);
+				}
+				parametr.appendChild(value);
+				parametr.appendChild(coordsXML)
+				Doc.appendChild(parametr);
+			}
+			break;
+	}
 	return Doc.XML();
 }
