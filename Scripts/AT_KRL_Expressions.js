@@ -88,6 +88,7 @@ AT_KRL_MathExpression.prototype.isNumber = function (ex) {
 AT_KRL_MathExpression.prototype.getAllSings = function () {
 	return [{
 		"sing": null,
+		"name": null,
 		"pos": 2,
 		"type": [],
 		"priority": null,
@@ -109,6 +110,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "-",
+		"name": "minus",
 		"pos": 2,
 		"type": ["bin", "coef"],
 		"priority": [0],
@@ -133,6 +135,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "+",
+		"name": "plus",
 		"pos": Infinity,
 		"type": ["bin"],
 		"priority": [0],
@@ -156,6 +159,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "/",
+		"name": "dev",
 		"pos": 2,
 		"type": ["bin"],
 		"priority": [1],
@@ -177,6 +181,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "*",
+		"name": "mult",
 		"pos": Infinity,
 		"type": ["bin"],
 		"priority": [1],
@@ -200,6 +205,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "^",
+		"name": "pow",
 		"pos": 2,
 		"type": ["bin"],
 		"priority": [1],
@@ -221,6 +227,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "sin",
+		"name": "sin",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -242,6 +249,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "cos",
+		"name": "cos",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -263,6 +271,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "tan",
+		"name": "tan",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -284,6 +293,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "ctan",
+		"name": "ctan",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -305,6 +315,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "asin",
+		"name": "asin",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -326,6 +337,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "acos",
+		"name": "acos",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -347,6 +359,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "atan",
+		"name": "atan",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -368,6 +381,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "actan",
+		"name": "actan",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -389,6 +403,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "sinh",
+		"name": "sinh",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -410,6 +425,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "cosh",
+		"name": "cosh",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -431,6 +447,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "tanh",
+		"name": "tanh",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -452,6 +469,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "ctanh",
+		"name": "ctanh",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -473,6 +491,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "asinh",
+		"name": "asinh",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -494,6 +513,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "acosh",
+		"name": "acosh",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -515,6 +535,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "atanh",
+		"name": "atanh",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -536,6 +557,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "actanh",
+		"name": "actanh",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -557,6 +579,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "exp",
+		"name": "exp",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -578,6 +601,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "log",
+		"name": "log",
 		"pos": 2,
 		"type": ["bin", "op"],
 		"priority": [2],
@@ -599,6 +623,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "lg",
+		"name": "lg",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -620,6 +645,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "ln",
+		"name": "ln",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -641,6 +667,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "sqrt",
+		"name": "sqrt",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -662,6 +689,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "abs",
+		"name": "abs",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -683,6 +711,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "sign",
+		"name": "sign",
 		"pos": 1,
 		"type": ["op"],
 		"priority": [2],
@@ -704,6 +733,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "div",
+		"name": "div",
 		"pos": 2,
 		"type": ["bin"],
 		"priority": [1],
@@ -725,6 +755,7 @@ AT_KRL_MathExpression.prototype.getAllSings = function () {
 		}
 	}, {
 		"sing": "mod",
+		"name": "mod",
 		"pos": 2,
 		"type": ["bin"],
 		"priority": [1],
@@ -826,8 +857,23 @@ AT_KRL_MathExpression.prototype.hasObjAttrRef = function (name, index, deep) {
 	return false;
 }
 
-AT_KRL_MathExpression.prototype.toXML = function(){
-	var tmp = new XMLDom('<tmp />');
-	tmp.setText(this.getKRL());
-	return tmp.XML();
+AT_KRL_MathExpression.prototype.toXML = function () {
+	if (this.sing == null) {
+		if (this.expressions[0].object) {
+			var r1 = new XMLDom('<ref />')
+			r1.setAttribute('id', this.expressions[0].object.name);
+			var r2 = new XMLDom('<ref />');
+			r2.setAttribute('id', this.expressions[0].object.attributes[this.expressions[0].aIndex].name);
+			r1.appendChild(r2);
+			return r1.XML();
+		} else {
+			return this.expressions[0].toXML();
+		}
+	} else {
+		var sg = new XMLDom('<math-' + this.getThisSing().name + ' />');
+		for (var i = 0; i < this.expressions.length; i++) {
+			sg.appendChild(new XMLDom(this.expressions[i].toXML()));
+		}
+		return sg.XML();
+	}
 }

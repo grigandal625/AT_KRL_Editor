@@ -478,6 +478,19 @@ if (JSON == undefined) {
 }
 
 
+Date.prototype.toPString = function () {
+	var day = (this.getDate()).toString();
+	if (day.length == 1) {
+		day = '0' + day;
+	}
+	var mh = (this.getMonth() + 1).toString();
+	if (mh.length == 1) {
+		mh = '0' + mh;
+	}
+	var y = this.getFullYear().toString();
+	return day + '.' + mh + '.' + y + ' ' + this.toLocaleTimeString();
+}
+
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (obj, start) {
 		for (var i = (start || 0), j = this.length; i < j; i++) {

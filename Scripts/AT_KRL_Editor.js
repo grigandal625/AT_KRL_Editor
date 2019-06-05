@@ -148,7 +148,7 @@ AT_KRL_Editor.prototype.getKRL = function () {
 }
 
 AT_KRL_Editor.prototype.toXML = function () {
-	var res = '<?xml version="1.0" encoding="UTF-8"?><knowledge-base creation-date="' + (new Date()).toLocaleString().replace(',', '') + '"><problem-info></problem-info><types>';
+	var res = '<?xml version="1.0" encoding="UTF-8"?><knowledge-base creation-date="' + (new Date()).toPString() + '"><problem-info></problem-info><types>';
 	for (var i = 0; i < this.types.length; i++) {
 		res += this.types[i].toXML();
 	}
@@ -167,6 +167,7 @@ AT_KRL_Editor.prototype.classXML = function () {
 	}
 	world.appendChild(properties);
 	world.appendChild(new XMLDom(this.rulesXML()));
+	world.appendChild(new XMLDom('<methods />'))
 	classes.appendChild(world);
 	return classes.XML();
 }
