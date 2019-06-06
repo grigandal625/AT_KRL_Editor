@@ -229,7 +229,9 @@ AT_KRL_Rule.prototype.toXML = function (index) {
 	var action = new XMLDom('<action />');
 	for (var i = 0; i < this.result.length; i++) {
 		var assign = new XMLDom('<assign />');
-		assign.appendChild(new XMLDom(this.result[i].toXML()));
+		var eq = new XMLDom(this.result[i].toXML());
+		assign.appendChild(eq.getChildNodes[0]);
+		assign.appendChild(eq.getChildNodes[1]);
 		action.appendChild(assign);
 	}
 	rule.appendChild(action);
@@ -238,7 +240,9 @@ AT_KRL_Rule.prototype.toXML = function (index) {
 		var elseAction = new XMLDom('<else-action />');
 		for (var i = 0; i < this.elsresult.length; i++) {
 			var assign = new XMLDom('<assign />');
-			assign.appendChild(new XMLDom(this.elsresult[i].toXML()));
+			var eq = new XMLDom(this.elsresult[i].toXML());
+			assign.appendChild(eq.getChildNodes[0]);
+			assign.appendChild(eq.getChildNodes[1]);
 			elseAction.appendChild(assign);
 		}
 		rule.appendChild(elseAction);
