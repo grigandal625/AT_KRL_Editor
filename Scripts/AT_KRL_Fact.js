@@ -38,7 +38,7 @@ var AT_KRL_Fact = function (leftside, rightside, sing, sure, exact) {
 		}
 	}
 
-	this.shure = [50, 100] || validateShure(shure);
+	this.shure = validateShure(sure) || [50, 100];
 	this.exact = parseFloat(validateExact(exact).toString() || '100');
 
 }
