@@ -163,7 +163,10 @@ AT_KRL_Editor.prototype.classXML = function () {
 	var properties = new XMLDom('<properties/>');
 	for (var i = 0; i < this.objects.length; i++) {
 		classes.appendChild(new XMLDom(this.objects[i].toXML(i)));
-		properties.appendChild(new XMLDom('<property id="' + this.objects[i].name + '" type="КЛАСС' + (i+1).toString() + '" desc="экземпляр класса КЛАСС' + (i+1).toString() + '" />'));
+		var cls = new XMLDom('<property id="' + this.objects[i].name + '" type="КЛАСС' + (i+1).toString() + '" desc="экземпляр класса КЛАСС' + (i+1).toString() + '" />');
+		cls.setAttribute('source','none');
+		cls.setAttribute('create','true');
+		properties.appendChild(cls);
 	}
 	world.appendChild(properties);
 	world.appendChild(new XMLDom(this.rulesXML()));

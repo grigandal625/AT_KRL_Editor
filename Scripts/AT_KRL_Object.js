@@ -106,7 +106,7 @@ AT_KRL_Attribute.prototype.getKRL = function () {
 AT_KRL_Object.prototype.toXML = function (num) {
 	var index = (num + 1) || 1;
 	var cls = new XMLDom('<class/>');
-	cls.setAttribute('id', this.name);
+	cls.setAttribute('id', 'КЛАСС' + index);
 	cls.setAttribute('desc', this.comment);
 	var properties = new XMLDom('<properties />');
 	for (var i = 0; i < this.attributes.length; i++) {
