@@ -1,3 +1,24 @@
+var AT_KRL_SimpleCondition = function (c) {
+	if (c.getKRL) {
+		this.condition = [c];
+	} else {
+		throw new Error('Invalid type of input condition or fact')
+	}
+}
+
+AT_KRL_SimpleCondition.prototype.getKRL = function () {
+	var res = this.condition[0].getKRL();
+	return res;
+}
+
+AT_KRL_SimpleCondition.prototype.calculate = function () {
+	return this.condition[0].calculate();
+}
+
+AT_KRL_SimpleCondition.prototype.toXML = function(){
+	return this.condition[0].toXML();
+}
+
 var AT_KRL_ConditionNot = function (c) {
 	if (c.getKRL) {
 		this.condition = [c];
@@ -137,13 +158,13 @@ var AT_KRL_Rule = function (a, cs, fs, n, e) {
 }
 
 AT_KRL_Rule.prototype.conditionHasTwoSides = function (cs) {
-	if (cs.condition.length > 1) {
+	/*if (cs.condition.length > 1) {
 		return true;
 	}
 	if (cs.condition[0].condition) {
 		return this.conditionHasTwoSides(cs.condition[0]);
-	}
-	return false;
+	}*/
+	return true;
 }
 
 AT_KRL_Rule.prototype.sideHasNoObject = function (side) {
