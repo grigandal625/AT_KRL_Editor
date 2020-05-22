@@ -600,9 +600,23 @@ AT_KRL_Parser.prototype.getMathExpressionTree = function (subline) {
             }
         }
     }
+	
+	while (subline.charAt(0) == ' ' || subline.charAt(0) == '\t'){
+		subline = subline.slice(1)
+	}
+	while (subline.charAt(subline.length - 1) == ' ' || subline.charAt(subline.length - 1) == '\t'){
+		subline = subline.slice(0, subline.length - 1)
+	}
     while (isInBrackets(subline)) {
         subline = this.getLineFromFirstBrackets(subline).res;
     }
+	while (subline.charAt(0) == ' ' || subline.charAt(0) == '\t'){
+		subline = subline.slice(1)
+	}
+	while (subline.charAt(subline.length - 1) == ' ' || subline.charAt(subline.length - 1) == '\t'){
+		subline = subline.slice(0, subline.length - 1)
+	}
+	
     for (var i = 0; i < inv.length; i++) {
         if (subline.indexOf(inv[i]) != -1) {
             throw new SyntaxError('Недопустимый символ "' + inv[i] + '" в объявлении ' + subline + ' на позиции ' + subline.indexOf(inv[i]));
@@ -1036,9 +1050,21 @@ AT_KRL_Parser.prototype.getLogicExpressionTree = function (subline) {
             }
         }
     }
+	while (subline.charAt(0) == ' ' || subline.charAt(0) == '\t'){
+		subline = subline.slice(1)
+	}
+	while (subline.charAt(subline.length - 1) == ' ' || subline.charAt(subline.length - 1) == '\t'){
+		subline = subline.slice(0, subline.length - 1)
+	}
     while (isInBrackets(subline)) {
         subline = this.getLineFromFirstBrackets(subline).res;
     }
+	while (subline.charAt(0) == ' ' || subline.charAt(0) == '\t'){
+		subline = subline.slice(1)
+	}
+	while (subline.charAt(subline.length - 1) == ' ' || subline.charAt(subline.length - 1) == '\t'){
+		subline = subline.slice(0, subline.length - 1)
+	}
     subline = subline.replaceAll('\n', '');
 
     var sings = this.getAllLogicSings();
